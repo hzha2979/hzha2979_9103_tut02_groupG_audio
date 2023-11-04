@@ -26,43 +26,28 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  
+  piano.setVolume(0.7);
+  bass.setVolume(1.0);
+  drum.setVolume(0.7);
+
+  //button to contrl the music
   button = createButton("play");
   button.mousePressed(togglePlaying);
-  //button is above other elments
-  button.style('z-index', '1');
 
-  // Position the button at the top-left corner of the canvas
-  button.position(0, 0);
+  fftPiano = new p5.FFT(0.1, 2048);
+  fftDrum = new p5.FFT(0.1, 2048);
+  fftBass = new p5.FFT();
   
+  // Connect the FFT objects to the sounds
+  fftPiano.setInput(piano);
+  fftDrum.setInput(drum);
+  fftBass.setInput(bass);
+
   let y1 = random(0, 150);
   let y2 = y1;
 
   
   // Use windowwidth and windowheight instead of width and height in rectangles below:
-  // Top four aqua lines:
-  for (let i = 0; i < 4; i++) {
-    let aquaRectangle = new Rectangle(0, i * y1, width, 15, '#Bffbfd');
-    rectangles.push(aquaRectangle);
-  }
-  // Last four horizontal aqua lines:
-  for (let i = 0; i < 4; i++) {
-    let aquaRectangle = new Rectangle(0, 250 + i * y1 * 2, width, 15, '#Bffbfd');
-    rectangles.push(aquaRectangle);
-  }
-
-
-  // Left three vertical aqua lines:
-  for (let i = 0; i < 3; i++) {
-    let aquaRectangle = new Rectangle(i * y1, 0, 15, height, '#Bffbfd');
-    rectangles.push(aquaRectangle);
-  }
-  // Right three vertical aqua lines:
-  for (let i = 0; i < 3; i++) {
-    let aquaRectangle = new Rectangle(250 + i * y1 * 2, 0, 15, height, '#Bffbfd');
-    rectangles.push(aquaRectangle);
-  }
-
   // Random small blocks:
 
   // 2
@@ -158,21 +143,21 @@ function setup() {
   }
 
   noStroke();
-
-  for (let i = 0; i < 15; i++) {
+  //Big rectangles
+  for (let i = 0; i < 20; i++) {
     // Randomly generate the position, size, and colour of block A:
 
 
     let x = random(width);
     let y = random(height);
-    let widthA = random(30, 50);
-    let heightA = random(30, 50);
+    let widthA = random(40, 60);
+    let heightA = random(40, 60);
 
     // Randomly generate the size of blocks B and C:
-    let widthB = widthA - random(10, 20);
-    let heightB = heightA - random(10, 20);
-    let widthC = widthA + random(10, 20);
-    let heightC = heightA + random(10, 20);
+    let widthB = widthA - random(10, 30);
+    let heightB = heightA - random(10, 30);
+    let widthC = widthA + random(10, 40);
+    let heightC = heightA + random(10, 40);
 
     // Randomly generate colours:
 
@@ -198,17 +183,36 @@ function windowResized() {
 
 function draw() {
   background('#000a0c');
-  // Draw rectangle:
+  
+  //Analyze drum frequencies
+  let spectrumDrum = fftDrum.analyze();
+  let drumAmplitude = fftDrum.getEnergy(7000, 10000);
+  // Map the drum amplitude to the shake effect
+  let shakeAmount = map(drumAmplitude, 0, 255, 0, 10); 
 
+
+  // Draw rectangle and apply shake effect to its x, y positions:
   for (let i = 0; i < rectangles.length; i++) {
+    rectangles[i].x += random(-shakeAmount, shakeAmount);
+    rectangles[i].y += random(-shakeAmount, shakeAmount);
     rectangles[i].draw();
   }
   push();
   rectMode(CENTER);
 
+  //Analyze piano frequencies
+  let spectrumPinao = fftPiano.analyze();
+  let pianoAmplitude = fftPiano.getEnergy(600, 6000);
+  // Map the piano amplitude to the breathe effect
+  let sizeAmount = map(pianoAmplitude, 0, 255, 0, 15); 
+  let brightness = map(pianoAmplitude, 0, 255, 30, 100); // 假设亮度值在30到100之间变化
+  
   for (let i = 0; i < rectanglesBig.length; i++) {
+    rectanglesBig[i].width += random(-sizeAmount, sizeAmount);
+    rectanglesBig[i].height += random(-sizeAmount, sizeAmount);
+    let currentColor = rectanglesBig[i].color;
+    fill(hue(currentColor), saturation(currentColor), brightness);
     rectanglesBig[i].draw();
-
   }
   pop();
 }

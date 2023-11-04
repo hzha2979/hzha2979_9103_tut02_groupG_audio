@@ -10,6 +10,16 @@ canvas {
 button {
   background-color: #2a91a4;
   color: white; 
+  border: none;
+  border-radius: 10px;
   font-family: 'Pixelify Sans', sans-serif;
-  
+  text-align: center;
+  display: inline-block;
+  font-size: 32px;
+  position: absolute;
+  top: 70%;
+  right: 45%;
+  bottom: 20%;
+  left: 45%;
+  z-index: 1 ;
 }
