@@ -1,18 +1,19 @@
 // Tut 2, Group G
 // Creative coding major project
 // Variation on Mondrian's 'Broadway Boogie Woogie'
-
+// Individual-Task-Audio-hzha2979
 
 let number = 30;
 let rectSpacing = 10;
 const numberOfaqua = 8;
-const colors = ['#08527d', '#1678A2', '#093169'];
-const colors2 = ['#Bffbfd', '#083360', '#2a91a4'];
+let colors;
+let colors2;
+
 // Create arrays to store multiple classes of rectangles:
 let rectangles = [];
 let rectanglesBig = [];
 
-
+//three part of the jazz music bigapple
 let piano, drum, bass;
 let fftPiano, fftDrum, fftBass;
 let isPlaying = false;
@@ -25,17 +26,24 @@ function preload() {
 }
 
 function setup() {
+ 
+  colorMode(HSB);
+  colors = [color(202, 93, 49), color(198, 86, 63), color(215, 91, 40)];
+  colors2 = [color(182, 24, 99), color(211, 92, 37), color(189, 74, 63)];
+
   createCanvas(windowWidth, windowHeight);
+
+  //the original volume of bass is too low to hear
   piano.setVolume(0.7);
   bass.setVolume(1.0);
   drum.setVolume(0.7);
 
-  //button to contrl the music
+  //button for user to play and stop the music
   button = createButton("play");
   button.mousePressed(togglePlaying);
 
   fftPiano = new p5.FFT(0.1, 2048);
-  fftDrum = new p5.FFT(0.1, 2048);
+  fftDrum = new p5.FFT(0.8, 2048);
   fftBass = new p5.FFT();
   
   // Connect the FFT objects to the sounds
@@ -49,6 +57,7 @@ function setup() {
   
   // Use windowwidth and windowheight instead of width and height in rectangles below:
   // Random small blocks:
+  //The numbers are the sequence of rows and columns when drawing.
 
   // 2
   for (let i = 0; i < number; i++) {
@@ -143,11 +152,12 @@ function setup() {
   }
 
   noStroke();
-  //Big rectangles
+
+
+  //Big rectangles consists of three rectangles at same position
+
   for (let i = 0; i < 20; i++) {
     // Randomly generate the position, size, and colour of block A:
-
-
     let x = random(width);
     let y = random(height);
     let widthA = random(40, 60);
@@ -160,7 +170,7 @@ function setup() {
     let heightC = heightA + random(10, 40);
 
     // Randomly generate colours:
-
+    
     let colorA = random(colors2);
     let colorB = random(colors2);
     let colorC = random(colors2);
@@ -203,15 +213,35 @@ function draw() {
   //Analyze piano frequencies
   let spectrumPinao = fftPiano.analyze();
   let pianoAmplitude = fftPiano.getEnergy(600, 6000);
+
   // Map the piano amplitude to the breathe effect
-  let sizeAmount = map(pianoAmplitude, 0, 255, 0, 15); 
-  let brightness = map(pianoAmplitude, 0, 255, 30, 100); // 假设亮度值在30到100之间变化
+  let sizeAmount = map(pianoAmplitude, 0, 255, 0, 20); 
+ 
+  
   
   for (let i = 0; i < rectanglesBig.length; i++) {
-    rectanglesBig[i].width += random(-sizeAmount, sizeAmount);
-    rectanglesBig[i].height += random(-sizeAmount, sizeAmount);
-    let currentColor = rectanglesBig[i].color;
-    fill(hue(currentColor), saturation(currentColor), brightness);
+    
+    //use constrain so control the size
+    let change = random(-sizeAmount, sizeAmount);
+    rectanglesBig[i].width = constrain(rectanglesBig[i].width + change, 10, 300); 
+    rectanglesBig[i].height = constrain(rectanglesBig[i].height + change, 10, 300); 
+
+   // Adjust the color brightness of the rectangle based on the piano amplitude
+   // If the amplitude is low, the rectangle's color will revert to its original
+
+    if (pianoAmplitude > 5) {
+      let currentColor = rectanglesBig[i].color;
+      let BrightAmount = map(pianoAmplitude, 10, 255, 0, 30);
+      let newBrightness = brightness(currentColor) + BrightAmount;
+      newBrightness = constrain(newBrightness, 0, 100); // p5.js function to constrain a value
+      let newColor = color(hue(currentColor), saturation(currentColor), newBrightness);
+      rectanglesBig[i].color = newColor;
+    } else {
+      rectanglesBig[i].resetColor();
+    }
+
+  
+    
     rectanglesBig[i].draw();
   }
   pop();
@@ -242,11 +272,15 @@ class Rectangle {
     this.width = width;
     this.height = height;
     this.color = color;
+    this.originalColor = color;
   }
 
   draw() {
     fill(this.color);
     rect(this.x, this.y, this.width, this.height);
+  }
+  resetColor() {
+    this.color = this.originalColor;
   }
 }
 
