@@ -3,12 +3,12 @@
 ### This visualization animates Mondrian's iconic art, making it groove to the vibrant boogie-woogie beats of the Big Apple. It transforms into a digital dance floor, where colors and shapes come alive, pulsating with the music. Small squares jitter in sync with the drum, while larger squares gently expand and contract, 'breathing' along with the piano.
 #### reference
 Code reference: 
-Text font used for buttons:
-Pixelify Sans - Google Fonts
+Picelify Sans font used for buttons:
+https://fonts.google.com/specimen/Pixelify+Sans?preview.text=Play&query=pixel
 
 Button:
-Pay and Pause Button
-button position
+Play and Pause button: https://www.youtube.com/watch?v=YcezEwOXun4
+Button position: https://www.w3schools.com/cssref/pr_pos_z-index.php
 
 Sound Visualization:
 17.11: Sound Visualization: Frequency Analysis with FFT - p5.js Sound Tutorial - YouTube
